@@ -1,39 +1,99 @@
-# History files
-.Rhistory
-.Rapp.history
+mydata <- read.csv("C:/Users/SHAHIPARTH/Desktop/cwurData.csv")
+View(mydata)
 
-# Session Data files
-.RData
+##omiting the nullvalues from the dataset cwurData
+mydata1<-na.omit
+is.na(mydata)
 
-# User-specific files
-.Ruserdata
+## Make a scatterplot a graph between the employment ratio and quality of education.
+library(ggplot2)
+qplot(national_rank, score,data=mydata,color="firebrick")
 
-# Example code in package build process
-*-Ex.R
+## find out the the countries scoring more than 80 in the years 2014 and 2015
+library(tidyverse)
+mydata %>% filter(score >=80) %>% select(year,score, country)
 
-# Output files from R CMD build
-/*.tar.gz
+##which university have best faculties of the world top 10 in the year 2015
+mydata %>% filter(world_rank <= 10 & year == 2015) %>%
+  select(institution,quality_of_faculty , year) %>%
+  arrange(quality_of_faculty)
+names(mydata)
 
-# Output files from R CMD check
-/*.Rcheck/
+##plot the graph represnting publications, years, institutaion or compare the graph between publications and citation
+e <- mydata %>% select(national_rank,institution,world_rank,citations,year,publications,score) %>% filter()
+e
+ggplot(e, aes(fill=e$institution, y=e$publications, x=e$year)) + 
+  geom_bar( stat="identity", position="fill")
+ggplot(e, aes(fill=e$institution, y=e$citations, x=e$year)) + 
+ geom_bar( stat="identity", position="fill")
 
-# RStudio files
-.Rproj.user/
+##plot the graph of score for all the year of the universities 
 
-# produced vignettes
-vignettes/*.html
-vignettes/*.pdf
+ggplot(data=mydata, aes(mydata$score)) + 
+  geom_histogram(breaks=seq(30, 80, by =2), 
+                 col="red", 
+                 aes(fill=..count..)) +
+  scale_fill_gradient("Count", low = "green", high = "red")
 
-# OAuth2 token, see https://github.com/hadley/httr/releases/tag/v0.3
-.httr-oauth
+##box plot of score
+boxplot(mydata$score)
+summary(mydata$score)
 
-# knitr and R markdown default cache directories
-*_cache/
-/cache/
+##timeseries
+mydata3<- read.csv("C:/Users/SHAHIPARTH/Desktop/education_expenditure_supplementary_data.csv", header=FALSE)
+mydata3<-na.omit(mydata3)
+View(mydata3)
+dim(mydata3)
 
-# Temporary files created by R markdown
-*.utf8.md
-*.knit.md
+mydata3<-mydata3[4:9]
+head(mydata3)
 
-# R Environment Variables
-.Renviron
+t<- ts(mydata3)
+t
+plot.ts(t)
+
+t1<-log(t)
+plot.ts(t1)
+
+##ts_1<-SMA(ts_1,n=1)
+#plot.ts(ts_1)
+
+#ts_1<- ts(mydata3)
+#ts_1
+#comp<-decompose(ts_1) 
+#plot(comp)
+
+## cut the data from between
+mydata %>% slice(150:155)
+
+## plot the graph of world_rank and score 
+ggplot(mydata,aes(x=world_rank,y=score))+geom_point(color='green')
+
+
+
+##machine learing
+
+x <- read.csv("C:/Users/SHAHIPARTH/Desktop/cwurData.csv")
+
+f <- x[sample(nrow(x)),]
+x_train <- f[1:2000, ]
+x_test <- f[2001:2200, ]
+library(rpart)
+model <- rpart(x$world_rank ~ x$patent
+               +x$alumni_employment
+               +x$citations
+               +x$publications
+               , data = x_train)
+install.packages("rpart.plot")
+install.packages("tree")
+library(tree)
+library(rpart.plot)
+rpart.plot(model, digits = 2)
+
+
+#wordcloud of country in 2016
+timesData <- read.csv("C:/Users/SHAHIPARTH/Desktop/timesData.csv")
+
+a <- timesData$country[timesData$year == 2011]
+wordcloud(a, min.freq = 500, random.order = FALSE,colors = brewer.pal(6, "Dark2"))
+
